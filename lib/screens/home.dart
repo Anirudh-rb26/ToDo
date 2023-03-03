@@ -12,7 +12,15 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   final todosList = ToDo.todoList();
+  List<ToDo> foundTodo = [];
   final todoController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    foundTodo = todosList;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +33,7 @@ class _HomeState extends State<Home> {
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             child: Column(
               children: [
-                SearchBox(),
+                searchBox(),
                 Expanded(
                   child: ListView(
                     children: [
@@ -35,7 +43,7 @@ class _HomeState extends State<Home> {
                             style: TextStyle(
                                 fontSize: 30, fontWeight: FontWeight.w500)),
                       ),
-                      for (ToDo todo in todosList)
+                      for (ToDo todo in foundTodo)
                         todoItem(
                           todo: todo,
                           onTodoChanged: handleTodoChange,
@@ -78,7 +86,9 @@ class _HomeState extends State<Home> {
                 margin: EdgeInsets.only(bottom: 20, right: 20),
                 child: ElevatedButton(
                   child: Text('+', style: TextStyle(fontSize: 40)),
-                  onPressed: () {addItem(todoController.text);},
+                  onPressed: () {
+                    addItem(todoController.text);
+                  },
                   style: ElevatedButton.styleFrom(
                       primary: tdBlue,
                       minimumSize: Size(60, 60),
@@ -88,6 +98,63 @@ class _HomeState extends State<Home> {
             ]),
           ),
         ],
+      ),
+    );
+  }
+
+
+  void handleTodoChange(ToDo todo) {
+    setState(() {
+      todo.isDone = !todo.isDone;
+    });
+  }
+
+  void deleteItem(String id) {
+    setState(() {
+      todosList.removeWhere((item) => item.id == id);
+    });
+  }
+
+  void addItem(String toDo) {
+    setState(() {
+      todosList.add(ToDo(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          todoText: toDo));
+    });
+    todoController.clear();
+  }
+
+  void searchItem(String keyWord) {
+    List<ToDo> results = [];
+    if (keyWord.isEmpty) {
+      results = todosList;
+    } else {
+      results = todosList
+          .where((item) =>
+              item.todoText!.toLowerCase().contains(keyWord.toLowerCase()))
+          .toList();
+    }
+
+    setState(() {
+      foundTodo = results;
+    });
+  }
+
+  Widget searchBox() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      decoration: BoxDecoration(
+          color: Colors.white, borderRadius: BorderRadius.circular(20)),
+      child: TextField(
+        onChanged: (value) => searchItem(value),
+        decoration: InputDecoration(
+          contentPadding: EdgeInsets.all(0),
+          prefixIcon: Icon(Icons.search, color: tdBlack, size: 20),
+          prefixIconConstraints: BoxConstraints(maxHeight: 20, minWidth: 25),
+          border: InputBorder.none,
+          hintText: "Search ToDo's.",
+          hintStyle: TextStyle(color: tdGrey),
+        ),
       ),
     );
   }
@@ -106,50 +173,6 @@ class _HomeState extends State<Home> {
           ),
           Container(child: Text('ToDo', style: TextStyle(color: tdBlack))),
         ],
-      ),
-    );
-  }
-
-  void handleTodoChange(ToDo todo) {
-    setState(() {
-      todo.isDone = !todo.isDone;
-    });
-  }
-
-  void deleteItem(String id) {
-    setState(() {
-      todosList.removeWhere((item) => item.id == id);
-    });
-  }
-
-  void addItem(String toDo) {
-    setState(() {
-      todosList.add(ToDo(id: DateTime.now().millisecondsSinceEpoch.toString(), todoText: toDo));
-    });
-    todoController.clear();
-  }
-}
-
-class SearchBox extends StatelessWidget {
-  const SearchBox({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15),
-      decoration: BoxDecoration(
-          color: Colors.white, borderRadius: BorderRadius.circular(20)),
-      child: TextField(
-        decoration: InputDecoration(
-          contentPadding: EdgeInsets.all(0),
-          prefixIcon: Icon(Icons.search, color: tdBlack, size: 20),
-          prefixIconConstraints: BoxConstraints(maxHeight: 20, minWidth: 25),
-          border: InputBorder.none,
-          hintText: "Search ToDo's.",
-          hintStyle: TextStyle(color: tdGrey),
-        ),
       ),
     );
   }
