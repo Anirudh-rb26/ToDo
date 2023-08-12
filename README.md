@@ -33,7 +33,3 @@ Follow these steps to run FlutterToDo on your local machine:
 ## Contributions
 
 FlutterToDo is an open-source project, and contributions are always welcome! Feel free to submit bug reports, feature requests, or pull requests. Please see the [contribution guidelines](CONTRIBUTING.md) for more information.
-
-## License
-
-FlutterToDo is released under the [MIT License](LICENSE).
